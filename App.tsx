@@ -19,10 +19,24 @@ export default function App() {
   const { sesion, cargando, cargarSesion } = useAuthStore();
 
   useEffect(() => {
-    // Al iniciar la aplicación, verificar si hay sesión activa
-    cargarSesion();
-    ejecutarSeed();
-    poblarContenidoFaltante();
+    const iniciarApp = async () => {
+      try {
+        // Al iniciar la aplicación, verificar si hay sesión activa
+        await cargarSesion();
+        
+        // El seeding solo debe ejecutarse en desarrollo local para desarrolladores
+        // para evitar sobrecargar la base de datos y acelerar el inicio en producción
+        if (__DEV__) {
+          console.log('🚧 Modo desarrollo: Verificando datos de base de datos...');
+          ejecutarSeed().catch(err => console.error('Error en ejecutarSeed:', err));
+          poblarContenidoFaltante().catch(err => console.error('Error en poblarContenidoFaltante:', err));
+        }
+      } catch (error) {
+        console.error('Error al iniciar la aplicación:', error);
+      }
+    };
+
+    iniciarApp();
   }, []);
 
   if (cargando && !sesion) {

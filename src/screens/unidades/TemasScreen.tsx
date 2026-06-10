@@ -66,17 +66,6 @@ export default function TemasScreen() {
             <Icon name="chevron-right" size={24} color={COLORS.primary} />
           </TouchableOpacity>
         )}
-        ListFooterComponent={() => (
-          <View style={styles.footerContainer}>
-            <TouchableOpacity 
-              style={styles.quizBtn}
-              onPress={() => navigation.navigate('Quiz', { unidadId, unidadTitulo })}
-            >
-              <Icon name="brain" size={24} color="#FFF" style={{ marginRight: 10 }} />
-              <Text style={styles.quizBtnText}>Tomar Evaluación de la Unidad</Text>
-            </TouchableOpacity>
-          </View>
-        )}
       />
     </View>
   );

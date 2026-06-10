@@ -117,13 +117,6 @@ export default function ResumenScreen() {
           </View>
         </View>
 
-        {/* Botón de autoevaluación */}
-        <TouchableOpacity
-          style={styles.primaryBtn}
-          onPress={() => navigation.navigate('Quiz', { unidadId, unidadTitulo })}
-        >
-          <Text style={styles.primaryBtnText}>Ir a Autoevaluación de esta unidad</Text>
-        </TouchableOpacity>
       </ScrollView>
     </View>
   );

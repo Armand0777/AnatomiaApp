@@ -4,13 +4,15 @@ import { useNavigation, useRoute } from '@react-navigation/native';
 import Icon from '@expo/vector-icons/MaterialCommunityIcons';
 import { COLORS } from '../../constants/colors';
 import { unidadesService } from '../../services/unidadesService';
+import { getUnidadVisual } from '../../constants/unidadesVisual';
 import { Tema } from '../../types';
 
 export default function TemasScreen() {
   const navigation = useNavigation<any>();
   const route = useRoute<any>();
   const { unidadId, unidadTitulo, unidadNumero } = route.params || {};
-  
+  const visual = getUnidadVisual(unidadNumero);
+
   const [temas, setTemas] = useState<Tema[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -59,8 +61,8 @@ export default function TemasScreen() {
               unidadTitulo
             })}
           >
-            <View style={styles.iconWrapper}>
-               <Text style={styles.emoji}>💀</Text> 
+            <View style={[styles.iconWrapper, { backgroundColor: visual.color + '26' }]}>
+              <Icon name={visual.icon as any} size={22} color={visual.color} />
             </View>
             <Text style={styles.temaTitle}>{item.orden}. {item.titulo}</Text>
             <Icon name="chevron-right" size={24} color={COLORS.primary} />
@@ -111,10 +113,12 @@ const styles = StyleSheet.create({
     borderBottomColor: '#EEE',
   },
   iconWrapper: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
     marginRight: 15,
-  },
-  emoji: {
-    fontSize: 30,
   },
   temaTitle: {
     flex: 1,
@@ -122,26 +126,4 @@ const styles = StyleSheet.create({
     color: '#1B1B1B',
     fontWeight: '600',
   },
-  footerContainer: {
-    padding: 20,
-    marginTop: 10,
-  },
-  quizBtn: {
-    backgroundColor: COLORS.primary,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 18,
-    borderRadius: 16,
-    elevation: 3,
-    shadowColor: '#000',
-    shadowOpacity: 0.1,
-    shadowRadius: 5,
-    shadowOffset: { width: 0, height: 2 },
-  },
-  quizBtnText: {
-    color: '#FFF',
-    fontSize: 18,
-    fontWeight: 'bold',
-  }
 });

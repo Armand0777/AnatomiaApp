@@ -3,21 +3,31 @@ import { View, Text, StyleSheet } from 'react-native';
 import { createDrawerNavigator, DrawerContentScrollView, DrawerItemList } from '@react-navigation/drawer';
 import Icon from '@expo/vector-icons/MaterialCommunityIcons';
 import { COLORS } from '../constants/colors';
+import { MODULOS } from '../constants/modulos';
 import { useAuthStore } from '../store/useAuthStore';
 
 // Pantallas principales
 import TabNavigator from './TabNavigator';
 import UnidadesScreen from '../screens/unidades/UnidadesScreen';
 import PerfilScreen from '../screens/home/PerfilScreen';
-
-// Pantallas faltantes (placeholders básicos)
-const BibliotecaScreen = () => <View style={styles.center}><Text>Biblioteca Multimedia</Text></View>;
-const AutoevaluacionScreen = () => <View style={styles.center}><Text>Autoevaluación</Text></View>;
-const AcercaDeScreen = () => <View style={styles.center}><Text>Acerca de</Text></View>;
+import AutoevaluacionScreen from '../screens/evaluacion/AutoevaluacionScreen';
+import BibliotecaScreen from '../screens/biblioteca/BibliotecaScreen';
+import AcercaDeScreen from '../screens/acercaDe/AcercaDeScreen';
 
 import AdminNavigator from './AdminNavigator';
 
 const Drawer = createDrawerNavigator();
+
+// Insignia circular con el color propio de cada módulo, para diferenciarlos
+// visualmente en el menú lateral en lugar de un ícono plano genérico.
+function DrawerIconBadge({ modulo, focused }: { modulo: keyof typeof MODULOS; focused: boolean }) {
+  const { icon, color } = MODULOS[modulo];
+  return (
+    <View style={[styles.iconBadge, { backgroundColor: focused ? color : color + '1A' }]}>
+      <Icon name={icon as any} size={18} color={focused ? '#FFF' : color} />
+    </View>
+  );
+}
 
 const CustomDrawerContent = (props: any) => {
   const usuario = useAuthStore(state => state.usuario);
@@ -66,52 +76,59 @@ export default function DrawerNavigator() {
         drawerActiveBackgroundColor: COLORS.primary + '1A',
         drawerActiveTintColor: COLORS.primary,
         drawerInactiveTintColor: '#333',
-        drawerLabelStyle: { fontSize: 16, marginLeft: -10 },
+        drawerLabelStyle: { fontSize: 15, marginLeft: -6, fontWeight: '600' },
+        drawerItemStyle: { borderRadius: 12, marginHorizontal: 8 },
       }}
     >
-      <Drawer.Screen 
-        name="InicioTabs" 
-        component={TabNavigator} 
-        options={{ drawerLabel: 'Inicio', drawerIcon: ({ color }) => <Icon name="home" size={24} color={color} /> }} 
+      <Drawer.Screen
+        name="InicioTabs"
+        component={TabNavigator}
+        options={{ drawerLabel: 'Inicio', drawerIcon: ({ focused }) => <DrawerIconBadge modulo="inicio" focused={focused} /> }}
       />
-      <Drawer.Screen 
-        name="UnidadesStack" 
-        component={UnidadesScreen} 
-        options={{ drawerLabel: 'Unidades', drawerIcon: ({ color }) => <Icon name="book-open-variant" size={24} color={color} /> }} 
+      <Drawer.Screen
+        name="UnidadesStack"
+        component={UnidadesScreen}
+        options={{ drawerLabel: 'Unidades', drawerIcon: ({ focused }) => <DrawerIconBadge modulo="unidades" focused={focused} /> }}
       />
-      <Drawer.Screen 
-        name="Biblioteca" 
-        component={BibliotecaScreen} 
-        options={{ drawerIcon: ({ color }) => <Icon name="play-circle" size={24} color={color} /> }} 
+      <Drawer.Screen
+        name="Biblioteca"
+        component={BibliotecaScreen}
+        options={{ drawerLabel: 'Biblioteca multimedia', drawerIcon: ({ focused }) => <DrawerIconBadge modulo="biblioteca" focused={focused} /> }}
       />
-      <Drawer.Screen 
-        name="Autoevaluacion" 
-        component={AutoevaluacionScreen} 
-        options={{ drawerIcon: ({ color }) => <Icon name="clipboard-check" size={24} color={color} /> }} 
+      <Drawer.Screen
+        name="Autoevaluacion"
+        component={AutoevaluacionScreen}
+        options={{ drawerLabel: 'Autoevaluación', drawerIcon: ({ focused }) => <DrawerIconBadge modulo="autoevaluacion" focused={focused} /> }}
       />
       {esDocente && (
-        <Drawer.Screen 
-          name="PanelDocente" 
-          component={AdminNavigator} 
-          options={{ drawerLabel: 'Panel Docente', drawerIcon: ({ color }) => <Icon name="shield-account" size={24} color={color} /> }} 
+        <Drawer.Screen
+          name="PanelDocente"
+          component={AdminNavigator}
+          options={{ drawerLabel: 'Panel Docente', drawerIcon: ({ focused }) => <DrawerIconBadge modulo="panelDocente" focused={focused} /> }}
         />
       )}
-      <Drawer.Screen 
-        name="AcercaDe" 
-        component={AcercaDeScreen} 
-        options={{ drawerLabel: 'Acerca de', drawerIcon: ({ color }) => <Icon name="information" size={24} color={color} /> }} 
+      <Drawer.Screen
+        name="AcercaDe"
+        component={AcercaDeScreen}
+        options={{ drawerLabel: 'Acerca de', drawerIcon: ({ focused }) => <DrawerIconBadge modulo="acercaDe" focused={focused} /> }}
       />
-      <Drawer.Screen 
-        name="Perfil" 
-        component={PerfilScreen} 
-        options={{ drawerIcon: ({ color }) => <Icon name="account" size={24} color={color} /> }} 
+      <Drawer.Screen
+        name="Perfil"
+        component={PerfilScreen}
+        options={{ drawerLabel: 'Perfil', drawerIcon: ({ focused }) => <DrawerIconBadge modulo="perfil" focused={focused} /> }}
       />
     </Drawer.Navigator>
   );
 }
 
 const styles = StyleSheet.create({
-  center: { flex: 1, justifyContent: 'center', alignItems: 'center' },
+  iconBadge: {
+    width: 32,
+    height: 32,
+    borderRadius: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   drawerContainer: {
     flex: 1,
   },

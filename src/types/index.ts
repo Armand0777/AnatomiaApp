@@ -69,12 +69,19 @@ export interface Multimedia {
   created_at: string;
 }
 
+// Una opción de respuesta puede venir con `letra` (banco nuevo A/B/C) o `id` (legado a/b/c/d)
+export interface OpcionPregunta {
+  letra?: string;
+  id?: string;
+  texto: string;
+}
+
 export interface Pregunta {
   id: string;
   unidad_id: string;
   enunciado: string;
   // Representación del JSONB de opciones
-  opciones: Array<{ id: string; texto: string }>; 
+  opciones: OpcionPregunta[];
   respuesta_correcta: number;
   explicacion: string | null;
   dificultad: number;

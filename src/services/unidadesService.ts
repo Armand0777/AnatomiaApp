@@ -6,6 +6,14 @@ export interface UnidadConTemas extends Unidad {
   temas?: { count: number }[];
 }
 
+export interface MultimediaConTema extends Multimedia {
+  temas?: {
+    titulo: string;
+    unidad_id: string;
+    unidades?: { numero: number; titulo: string } | null;
+  } | null;
+}
+
 export const unidadesService = {
   getUnidades: async (): Promise<UnidadConTemas[]> => {
     try {
@@ -117,6 +125,24 @@ export const unidadesService = {
       return data || [];
     } catch (error) {
       console.error('Error al buscar temas:', error);
+      return [];
+    }
+  },
+
+  // Catálogo completo de imágenes y videos para la Biblioteca Multimedia
+  getBibliotecaMultimedia: async (): Promise<MultimediaConTema[]> => {
+    try {
+      const { data, error } = await supabase
+        .from('multimedia')
+        .select('*, temas(titulo, unidad_id, unidades(numero, titulo))')
+        .in('tipo', ['imagen', 'video'])
+        .eq('activo', true)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      return data || [];
+    } catch (error) {
+      console.error('Error al obtener la biblioteca multimedia:', error);
       return [];
     }
   },

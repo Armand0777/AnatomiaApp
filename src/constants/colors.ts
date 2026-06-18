@@ -16,4 +16,9 @@ export const COLORS = {
   tabBarActive: '#2E7D32',
   tabBarInactive: '#A5D6A7',
   error: '#D32F2F',
+  // Estados (módulo de autoevaluación)
+  correcto: '#4CAF50',
+  incorrecto: '#F44336',
+  advertencia: '#FF9800',
+  neutro: '#9E9E9E',
 };

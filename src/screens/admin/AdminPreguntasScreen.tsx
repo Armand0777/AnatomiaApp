@@ -63,12 +63,16 @@ export default function AdminPreguntasScreen() {
   const abrirModalEditar = (pregunta: Pregunta) => {
     setEditando(pregunta);
     setEnunciado(pregunta.enunciado);
-    setOpciones(pregunta.opciones || [
-      { id: 'a', texto: '' },
-      { id: 'b', texto: '' },
-      { id: 'c', texto: '' },
-      { id: 'd', texto: '' }
-    ]);
+    setOpciones(
+      pregunta.opciones?.length
+        ? pregunta.opciones.map((o, i) => ({ id: o.id || o.letra?.toLowerCase() || String.fromCharCode(97 + i), texto: o.texto }))
+        : [
+            { id: 'a', texto: '' },
+            { id: 'b', texto: '' },
+            { id: 'c', texto: '' },
+            { id: 'd', texto: '' }
+          ]
+    );
     setRespuestaCorrecta(pregunta.respuesta_correcta);
     setExplicacion(pregunta.explicacion || '');
     setModalVisible(true);

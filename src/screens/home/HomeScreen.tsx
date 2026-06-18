@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, Image, TouchableOpacity, ScrollView, Modal, Fla
 import { useNavigation } from '@react-navigation/native';
 import Icon from '@expo/vector-icons/MaterialCommunityIcons';
 import { COLORS } from '../../constants/colors';
+import { MODULOS } from '../../constants/modulos';
 
 export default function HomeScreen() {
   const navigation = useNavigation<any>();
@@ -10,15 +11,15 @@ export default function HomeScreen() {
 
   const notifications = [
     { id: '1', title: '💀 Nueva Estructura Cefálica', description: 'Se agregaron imágenes de alta calidad del Hueso Temporal. ¡Revísalas en la Unidad 1!', time: 'Hace 10 min' },
-    { id: '2', title: '🎓 Quiz semanal disponible', description: 'Ya está habilitada la autoevaluación de Miología y Sistema Neurovascular.', time: 'Hace 2 horas' },
-    { id: '3', title: '🎉 ¡Bienvenido a AnatomíaApp!', description: 'Explora las 4 unidades de cabeza y cuello con teoría, resúmenes, videos y quizes.', time: 'Ayer' },
+    { id: '2', title: '📋 Autoevaluación disponible', description: 'Ya está habilitado el banco de preguntas de las 4 unidades.', time: 'Hace 2 horas' },
+    { id: '3', title: '🎉 ¡Bienvenido a AnatomíaApp!', description: 'Explora las 4 unidades de cabeza y cuello con teoría, resúmenes, videos y autoevaluaciones.', time: 'Ayer' },
   ];
 
   const modulos = [
-    { id: 'unidades', titulo: 'Unidades', desc: 'Contenido teórico organizado por unidades', color: COLORS.primary, icon: 'book-open-page-variant', route: 'UnidadesStack' },
-    { id: 'multimedia', titulo: 'Biblioteca multimedia', desc: 'Videos, imágenes y esquemas interactivos', color: COLORS.secondary, icon: 'play-circle', route: 'Biblioteca' },
-    { id: 'evaluacion', titulo: 'Autoevaluación', desc: 'Simulaciones de examen y evaluaciones', color: '#673AB7', icon: 'clipboard-check-outline', route: 'Autoevaluacion' },
-    { id: 'acerca', titulo: 'Acerca de', desc: 'Información sobre la aplicación y el proyecto', color: '#757575', icon: 'information-outline', route: 'AcercaDe' },
+    { id: 'unidades', titulo: 'Unidades', desc: 'Contenido teórico organizado por unidades', ...MODULOS.unidades, route: 'UnidadesStack' },
+    { id: 'multimedia', titulo: 'Biblioteca multimedia', desc: 'Videos, imágenes y esquemas interactivos', ...MODULOS.biblioteca, route: 'Biblioteca' },
+    { id: 'evaluacion', titulo: 'Autoevaluación', desc: 'Simulaciones de examen y evaluaciones', ...MODULOS.autoevaluacion, route: 'Autoevaluacion' },
+    { id: 'acerca', titulo: 'Acerca de', desc: 'Información sobre la aplicación y el proyecto', ...MODULOS.acercaDe, route: 'AcercaDe' },
   ];
 
   return (

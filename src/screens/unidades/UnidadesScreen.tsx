@@ -4,6 +4,7 @@ import { useNavigation } from '@react-navigation/native';
 import Icon from '@expo/vector-icons/MaterialCommunityIcons';
 import { COLORS } from '../../constants/colors';
 import { unidadesService, UnidadConTemas } from '../../services/unidadesService';
+import { getUnidadVisual } from '../../constants/unidadesVisual';
 
 export default function UnidadesScreen() {
   const navigation = useNavigation<any>();
@@ -18,11 +19,6 @@ export default function UnidadesScreen() {
     };
     fetchUnidades();
   }, []);
-
-  const getBackgroundForUnidad = (index: number) => {
-    const colors = ['#E3F2FD', '#E8F5E9', '#FFF3E0', '#F3E5F5'];
-    return colors[index % colors.length];
-  };
 
   if (loading) {
     return (
@@ -48,24 +44,27 @@ export default function UnidadesScreen() {
         data={unidades}
         keyExtractor={(item) => item.id}
         contentContainerStyle={styles.listContainer}
-        renderItem={({ item, index }) => (
-          <TouchableOpacity 
-            style={[styles.card, { backgroundColor: getBackgroundForUnidad(index) }]}
-            onPress={() => navigation.navigate('Temas', { 
-              unidadId: item.id, 
-              unidadTitulo: `Unidad ${item.numero}`, 
-              unidadNumero: item.numero 
-            })}
-          >
-            <View style={styles.cardContent}>
-              <Text style={styles.unidadNumero}>Unidad {['I', 'II', 'III', 'IV', 'V'][item.numero - 1] || item.numero}</Text>
-              <Text style={styles.unidadTitulo}>{item.titulo}</Text>
-            </View>
-            <View style={styles.iconContainer}>
-              <Text style={styles.emoji}>{item.imagen_url || '📚'}</Text>
-            </View>
-          </TouchableOpacity>
-        )}
+        renderItem={({ item, index }) => {
+          const visual = getUnidadVisual(item.numero);
+          return (
+            <TouchableOpacity
+              style={[styles.card, { backgroundColor: visual.bg }]}
+              onPress={() => navigation.navigate('Temas', {
+                unidadId: item.id,
+                unidadTitulo: `Unidad ${item.numero}`,
+                unidadNumero: item.numero
+              })}
+            >
+              <View style={styles.cardContent}>
+                <Text style={styles.unidadNumero}>Unidad {['I', 'II', 'III', 'IV', 'V'][item.numero - 1] || item.numero}</Text>
+                <Text style={styles.unidadTitulo}>{item.titulo}</Text>
+              </View>
+              <View style={[styles.iconContainer, { backgroundColor: visual.color + '26' }]}>
+                <Icon name={visual.icon as any} size={32} color={visual.color} />
+              </View>
+            </TouchableOpacity>
+          );
+        }}
       />
     </View>
   );
@@ -139,12 +138,10 @@ const styles = StyleSheet.create({
     lineHeight: 20,
   },
   iconContainer: {
-    width: 60,
-    height: 60,
+    width: 56,
+    height: 56,
+    borderRadius: 28,
     justifyContent: 'center',
     alignItems: 'center',
   },
-  emoji: {
-    fontSize: 45,
-  }
 });

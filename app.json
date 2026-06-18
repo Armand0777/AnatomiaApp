@@ -16,6 +16,10 @@
       },
       "predictiveBackGestureEnabled": false
     },
+    "ios": {
+      "bundleIdentifier": "com.armandogh.anatomiaapp",
+      "supportsTablet": true
+    },
     "web": {
       "favicon": "./assets/favicon.png"
     },

@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, Image } from 'react-native';
 import { createDrawerNavigator, DrawerContentScrollView, DrawerItemList } from '@react-navigation/drawer';
 import Icon from '@expo/vector-icons/MaterialCommunityIcons';
 import { COLORS } from '../constants/colors';
@@ -42,7 +42,7 @@ const CustomDrawerContent = (props: any) => {
   return (
     <View style={styles.drawerContainer}>
       <View style={styles.drawerHeader}>
-        <Text style={styles.logo}>💀</Text>
+        <Image source={require('../../assets/logocentral.png')} style={styles.logo} resizeMode="contain" />
         <Text style={styles.title}>Anatomía</Text>
         <Text style={styles.subtitle}>Cabeza y Cuello</Text>
       </View>
@@ -139,7 +139,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   logo: {
-    fontSize: 50,
+    width: 64,
+    height: 64,
     marginBottom: 10,
   },
   title: {

@@ -106,7 +106,12 @@ export default function ReportesScreen() {
           </View>
 
           {/* Filtro por unidad */}
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.chipsRow}>
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            style={styles.chipsScroll}
+            contentContainerStyle={styles.chipsRow}
+          >
             <TouchableOpacity
               style={[styles.chip, !unidadFiltro && styles.chipActivo]}
               onPress={() => setUnidadFiltro(null)}
@@ -203,7 +208,8 @@ const styles = StyleSheet.create({
   resumenCard: { flex: 1, backgroundColor: '#FFF', borderRadius: 14, padding: 14, alignItems: 'center', elevation: 1 },
   resumenValor: { fontSize: 20, fontWeight: 'bold', color: COLORS.textPrimary },
   resumenLabel: { fontSize: 11, color: '#888', marginTop: 4, textAlign: 'center' },
-  chipsRow: { paddingHorizontal: 16, gap: 8, paddingBottom: 6 },
+  chipsScroll: { flexGrow: 0, flexShrink: 0, height: 50 },
+  chipsRow: { paddingHorizontal: 16, gap: 8, paddingBottom: 6, alignItems: 'center' },
   chip: { borderWidth: 1, borderColor: COLORS.border, borderRadius: 18, paddingHorizontal: 14, paddingVertical: 7, marginRight: 8, backgroundColor: '#FFF' },
   chipActivo: { backgroundColor: ACCENT, borderColor: ACCENT },
   chipText: { color: ACCENT, fontSize: 13, fontWeight: '600' },

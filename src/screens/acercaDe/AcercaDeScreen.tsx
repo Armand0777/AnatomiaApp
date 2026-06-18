@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import Icon from '@expo/vector-icons/MaterialCommunityIcons';
 import { COLORS } from '../../constants/colors';
@@ -36,7 +36,7 @@ export default function AcercaDeScreen() {
       {/* Identidad de la app */}
       <View style={styles.heroCard}>
         <View style={styles.heroIcon}>
-          <Text style={styles.heroEmoji}>💀</Text>
+          <Image source={require('../../../assets/logocentral.png')} style={styles.heroLogo} resizeMode="contain" />
         </View>
         <Text style={styles.heroTitulo}>Anatomía de Cabeza y Cuello</Text>
         <Text style={styles.heroSubtitulo}>Aplicación educativa · Anatomía Humana I</Text>
@@ -125,15 +125,16 @@ const styles = StyleSheet.create({
 
   heroCard: { alignItems: 'center', paddingVertical: 28, paddingHorizontal: 20 },
   heroIcon: {
-    width: 76,
-    height: 76,
-    borderRadius: 38,
+    width: 84,
+    height: 84,
+    borderRadius: 42,
     backgroundColor: COLORS.card,
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 14,
+    overflow: 'hidden',
   },
-  heroEmoji: { fontSize: 38 },
+  heroLogo: { width: 64, height: 64 },
   heroTitulo: { fontSize: 19, fontWeight: 'bold', color: COLORS.textPrimary, textAlign: 'center' },
   heroSubtitulo: { fontSize: 13, color: '#777', marginTop: 4, textAlign: 'center' },
   versionBadge: { backgroundColor: COLORS.card, borderRadius: 12, paddingHorizontal: 10, paddingVertical: 4, marginTop: 10 },

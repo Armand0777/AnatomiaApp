@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import { View, Text, StyleSheet, Animated, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, Animated, TouchableOpacity, Image } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { COLORS } from '../../constants/colors';
@@ -38,7 +38,7 @@ export default function BienvenidaScreen() {
   return (
     <View style={styles.container}>
       <Animated.View style={[styles.content, { opacity: fadeAnim, transform: [{ translateY: translateYAnim }] }]}>
-        <Text style={styles.logoEmoji}>🧠</Text>
+        <Image source={require('../../../assets/logocentral.png')} style={styles.logo} resizeMode="contain" />
         <Text style={styles.title}>Anatomía de</Text>
         <Text style={styles.titleBold}>Cabeza y Cuello</Text>
         <Text style={styles.subtitle}>Explora el cuerpo humano como nunca antes</Text>
@@ -75,8 +75,9 @@ const styles = StyleSheet.create({
     width: '100%',
     alignItems: 'center',
   },
-  logoEmoji: {
-    fontSize: 80,
+  logo: {
+    width: 140,
+    height: 140,
     marginBottom: 24,
   },
   title: {

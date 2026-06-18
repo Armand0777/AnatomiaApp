@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
+import { Image } from 'expo-image';
 import Icon from '@expo/vector-icons/MaterialCommunityIcons';
 import { COLORS } from '../../constants/colors';
 import { MODULOS } from '../../constants/modulos';
@@ -59,6 +60,10 @@ export default function RevisionRespuestasScreen() {
           <Icon name={esCorrecta ? 'check-circle' : 'close-circle'} size={16} color="#FFF" />
           <Text style={styles.badgeText}>{esCorrecta ? 'Correcta' : respondida ? 'Incorrecta' : 'Sin responder'}</Text>
         </View>
+
+        {pregunta.imagen_url && (
+          <Image source={{ uri: pregunta.imagen_url }} style={styles.imagenPregunta} contentFit="cover" />
+        )}
 
         <Text style={styles.enunciado}>{pregunta.enunciado}</Text>
 
@@ -148,6 +153,7 @@ const styles = StyleSheet.create({
   badgeCorrecta: { backgroundColor: COLORS.correcto },
   badgeIncorrecta: { backgroundColor: COLORS.incorrecto },
   badgeText: { color: '#FFF', fontWeight: 'bold', fontSize: 12 },
+  imagenPregunta: { width: '100%', height: 180, borderRadius: 14, backgroundColor: '#EEE', marginBottom: 16 },
   enunciado: { fontSize: 18, fontWeight: '600', color: COLORS.textPrimary, lineHeight: 26, marginBottom: 20 },
   respuestaBox: { backgroundColor: COLORS.card, borderRadius: 12, padding: 14, marginBottom: 12 },
   respuestaLabel: { fontSize: 12, color: '#777', marginBottom: 4, fontWeight: 'bold' },

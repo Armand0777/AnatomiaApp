@@ -38,7 +38,9 @@ function colorPorcentaje(p: number) {
 export default function PerfilScreen() {
   const usuario = useAuthStore((state) => state.usuario);
   const logout = useAuthStore((state) => state.logout);
-  const { esInvitado } = useRolAcceso();
+  const { esInvitado, esAdmin, esDocente, esEstudiante } = useRolAcceso();
+
+  const rolLabel = esAdmin ? 'Administrador' : esDocente ? 'Docente' : esInvitado ? 'Invitado' : 'Estudiante';
 
   const [sesiones, setSesiones] = useState<SesionConRelaciones[]>([]);
   const [cargando, setCargando] = useState(true);
@@ -101,7 +103,7 @@ export default function PerfilScreen() {
           <Text style={styles.email}>{usuario?.email}</Text>
         </View>
         <View style={styles.badgeContainer}>
-          <Text style={styles.badgeText}>{esInvitado ? 'Invitado' : 'Estudiante'}</Text>
+          <Text style={styles.badgeText}>{rolLabel}</Text>
         </View>
       </View>
 
@@ -122,24 +124,26 @@ export default function PerfilScreen() {
         </View>
       ) : (
         <View style={styles.content}>
-          {/* Nivel */}
-          <View style={styles.nivelCard}>
-            <View style={styles.nivelIconWrap}>
-              <Icon name={nivelActual.icon as any} size={28} color="#FFF" />
-            </View>
-            <View style={{ flex: 1 }}>
-              <Text style={styles.nivelLabel}>Tu nivel</Text>
-              <Text style={styles.nivelNombre}>{nivelActual.nombre}</Text>
-              <View style={styles.nivelBarBg}>
-                <View style={[styles.nivelBarFill, { width: `${progresoNivel * 100}%` }]} />
+          {/* Nivel: solo aplica a estudiantes, no tiene sentido para docente/admin */}
+          {esEstudiante && (
+            <View style={styles.nivelCard}>
+              <View style={styles.nivelIconWrap}>
+                <Icon name={nivelActual.icon as any} size={28} color="#FFF" />
               </View>
-              <Text style={styles.nivelSiguiente}>
-                {nivelSiguiente
-                  ? `${totalEvaluaciones}/${nivelSiguiente.min} evaluaciones para "${nivelSiguiente.nombre}"`
-                  : '¡Nivel máximo alcanzado!'}
-              </Text>
+              <View style={{ flex: 1 }}>
+                <Text style={styles.nivelLabel}>Tu nivel</Text>
+                <Text style={styles.nivelNombre}>{nivelActual.nombre}</Text>
+                <View style={styles.nivelBarBg}>
+                  <View style={[styles.nivelBarFill, { width: `${progresoNivel * 100}%` }]} />
+                </View>
+                <Text style={styles.nivelSiguiente}>
+                  {nivelSiguiente
+                    ? `${totalEvaluaciones}/${nivelSiguiente.min} evaluaciones para "${nivelSiguiente.nombre}"`
+                    : '¡Nivel máximo alcanzado!'}
+                </Text>
+              </View>
             </View>
-          </View>
+          )}
 
           {/* Estadísticas */}
           <View style={styles.statsRow}>

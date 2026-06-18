@@ -1,13 +1,16 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, FlatList, TouchableOpacity, Alert, TextInput, ScrollView, Modal } from 'react-native';
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, Alert, TextInput, ScrollView, Modal, ActivityIndicator } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import Icon from '@expo/vector-icons/MaterialCommunityIcons';
+import { Image } from 'expo-image';
+import * as ImagePicker from 'expo-image-picker';
 import { COLORS } from '../../constants/colors';
 import { MODULOS } from '../../constants/modulos';
 
 const ACCENT = MODULOS.autoevaluacion.color;
 import { unidadesService, UnidadConTemas } from '../../services/unidadesService';
 import { evaluacionService } from '../../services/evaluacionService';
+import { adminService } from '../../services/adminService';
 import { useRolAcceso } from '../../hooks/useRolAcceso';
 import { Pregunta } from '../../types';
 
@@ -38,6 +41,8 @@ export default function GestionPreguntasScreen() {
   const [respuestaCorrecta, setRespuestaCorrecta] = useState(0);
   const [explicacion, setExplicacion] = useState('');
   const [dificultad, setDificultad] = useState(1);
+  const [imagenUrl, setImagenUrl] = useState<string | null>(null);
+  const [subiendoImagen, setSubiendoImagen] = useState(false);
 
   useEffect(() => {
     const cargarUnidades = async () => {
@@ -67,6 +72,7 @@ export default function GestionPreguntasScreen() {
     setRespuestaCorrecta(0);
     setExplicacion('');
     setDificultad(1);
+    setImagenUrl(null);
     setModalVisible(true);
   };
 
@@ -81,7 +87,35 @@ export default function GestionPreguntasScreen() {
     setRespuestaCorrecta(pregunta.respuesta_correcta);
     setExplicacion(pregunta.explicacion || '');
     setDificultad(pregunta.dificultad || 1);
+    setImagenUrl(pregunta.imagen_url || null);
     setModalVisible(true);
+  };
+
+  const seleccionarImagen = async () => {
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (status !== 'granted') {
+      Alert.alert('Permiso denegado', 'Necesitamos acceso a tu galería para subir la imagen.');
+      return;
+    }
+
+    const resultado = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ['images'],
+      allowsEditing: false,
+      quality: 0.8,
+    });
+
+    if (resultado.canceled || !resultado.assets?.length) return;
+
+    try {
+      setSubiendoImagen(true);
+      const publicUrl = await adminService.subirArchivoStorage(resultado.assets[0].uri, 'preguntas');
+      setImagenUrl(publicUrl);
+    } catch (error) {
+      console.error(error);
+      Alert.alert('Error', 'No se pudo subir la imagen.');
+    } finally {
+      setSubiendoImagen(false);
+    }
   };
 
   const actualizarOpcion = (index: number, texto: string) => {
@@ -106,6 +140,7 @@ export default function GestionPreguntasScreen() {
         explicacion,
         dificultad,
         activo: true,
+        imagen_url: imagenUrl,
       };
 
       if (editando) {
@@ -161,7 +196,12 @@ export default function GestionPreguntasScreen() {
       </View>
 
       {/* Chips de unidad */}
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.chipsRow}>
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        style={styles.chipsScroll}
+        contentContainerStyle={styles.chipsRow}
+      >
         {unidades.map((u) => {
           const activa = unidadActiva?.id === u.id;
           return (
@@ -192,6 +232,7 @@ export default function GestionPreguntasScreen() {
                 <Text style={styles.dificultadEmoji}>
                   {DIFICULTADES.find((d) => d.valor === item.dificultad)?.emoji || '🟢'}
                 </Text>
+                {item.imagen_url && <Icon name="image" size={14} color={ACCENT} />}
               </View>
               <View style={styles.actions}>
                 <TouchableOpacity onPress={() => abrirModalEditar(item)} style={styles.actionBtn}>
@@ -237,7 +278,28 @@ export default function GestionPreguntasScreen() {
             placeholder="Ej: ¿Qué hueso forma la frente?"
           />
 
-          <Text style={styles.label}>Opciones</Text>
+          <Text style={styles.label}>Imagen de referencia (opcional)</Text>
+          {imagenUrl ? (
+            <View style={styles.imagenPreviewWrap}>
+              <Image source={{ uri: imagenUrl }} style={styles.imagenPreview} contentFit="cover" />
+              <TouchableOpacity style={styles.imagenQuitarBtn} onPress={() => setImagenUrl(null)}>
+                <Icon name="close-circle" size={22} color={COLORS.incorrecto} />
+              </TouchableOpacity>
+            </View>
+          ) : (
+            <TouchableOpacity style={styles.imagenSubirBtn} onPress={seleccionarImagen} disabled={subiendoImagen}>
+              {subiendoImagen ? (
+                <ActivityIndicator color={ACCENT} />
+              ) : (
+                <>
+                  <Icon name="image-plus" size={22} color={ACCENT} />
+                  <Text style={styles.imagenSubirText}>Subir imagen para que el estudiante la observe</Text>
+                </>
+              )}
+            </TouchableOpacity>
+          )}
+
+          <Text style={[styles.label, { marginTop: 20 }]}>Opciones</Text>
           {opciones.map((op, idx) => (
             <View key={op.letra} style={styles.opcionRow}>
               <TouchableOpacity style={styles.radioBtn} onPress={() => setRespuestaCorrecta(idx)}>
@@ -304,7 +366,8 @@ const styles = StyleSheet.create({
   },
   backBtn: { padding: 5 },
   headerTitle: { color: COLORS.headerText, fontSize: 17, fontWeight: 'bold' },
-  chipsRow: { paddingHorizontal: 16, paddingVertical: 12, gap: 8 },
+  chipsScroll: { flexGrow: 0, flexShrink: 0, height: 60 },
+  chipsRow: { paddingHorizontal: 16, paddingVertical: 12, gap: 8, alignItems: 'center' },
   chipUnidad: { borderWidth: 1, borderColor: COLORS.border, borderRadius: 18, paddingHorizontal: 14, paddingVertical: 7, marginRight: 8, backgroundColor: '#FFF' },
   chipUnidadActiva: { backgroundColor: ACCENT, borderColor: ACCENT },
   chipUnidadText: { color: ACCENT, fontSize: 13, fontWeight: '600' },
@@ -325,6 +388,23 @@ const styles = StyleSheet.create({
   label: { fontSize: 16, fontWeight: 'bold', color: '#444', marginBottom: 8 },
   unidadFija: { fontSize: 14, color: ACCENT, fontWeight: '600', marginBottom: 20 },
   inputArea: { backgroundColor: '#F9F9F9', borderWidth: 1, borderColor: '#DDD', borderRadius: 8, padding: 15, fontSize: 16, height: 100, textAlignVertical: 'top', marginBottom: 20 },
+  imagenSubirBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    borderWidth: 1.5,
+    borderColor: ACCENT,
+    borderStyle: 'dashed',
+    borderRadius: 10,
+    paddingVertical: 16,
+    paddingHorizontal: 12,
+    marginBottom: 20,
+  },
+  imagenSubirText: { color: ACCENT, fontSize: 13, fontWeight: '600', flex: 1 },
+  imagenPreviewWrap: { marginBottom: 20 },
+  imagenPreview: { width: '100%', height: 160, borderRadius: 10, backgroundColor: '#EEE' },
+  imagenQuitarBtn: { position: 'absolute', top: 8, right: 8, backgroundColor: '#FFF', borderRadius: 12 },
   opcionRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 10, gap: 6 },
   radioBtn: { marginRight: 4 },
   letraLabel: { fontWeight: 'bold', color: ACCENT, width: 16 },

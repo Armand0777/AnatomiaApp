@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, ActivityIndicator, Alert, BackHandler } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, ActivityIndicator, Alert, BackHandler, Modal } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
+import { Image } from 'expo-image';
 import Icon from '@expo/vector-icons/MaterialCommunityIcons';
 import { COLORS } from '../../constants/colors';
 import { MODULOS } from '../../constants/modulos';
@@ -42,6 +43,7 @@ export default function SimulacionExamenScreen() {
   const [indiceActual, setIndiceActual] = useState(0);
   const [respuestasUsuario, setRespuestasUsuario] = useState<Record<string, number>>({});
   const [tiempoRestante, setTiempoRestante] = useState(DURACION_SEGUNDOS);
+  const [imagenAmpliada, setImagenAmpliada] = useState<string | null>(null);
 
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const finalizadoRef = useRef(false);
@@ -187,6 +189,21 @@ export default function SimulacionExamenScreen() {
       </View>
 
       <ScrollView contentContainerStyle={styles.scrollContent}>
+        {/* Imagen de referencia, si la pregunta tiene una */}
+        {pregunta.imagen_url && (
+          <TouchableOpacity
+            style={styles.imagenPreguntaWrap}
+            onPress={() => setImagenAmpliada(pregunta.imagen_url!)}
+            activeOpacity={0.9}
+          >
+            <Image source={{ uri: pregunta.imagen_url }} style={styles.imagenPregunta} contentFit="cover" />
+            <View style={styles.imagenZoomBadge}>
+              <Icon name="magnify-plus-outline" size={16} color="#FFF" />
+              <Text style={styles.imagenZoomText}>Tocar para ampliar</Text>
+            </View>
+          </TouchableOpacity>
+        )}
+
         {/* Tarjeta de pregunta */}
         <View style={styles.preguntaCard}>
           <Text style={styles.preguntaText}>{pregunta.enunciado}</Text>
@@ -249,6 +266,18 @@ export default function SimulacionExamenScreen() {
           </TouchableOpacity>
         </View>
       </View>
+
+      {/* Imagen ampliada a pantalla completa */}
+      <Modal visible={!!imagenAmpliada} transparent animationType="fade" onRequestClose={() => setImagenAmpliada(null)}>
+        <TouchableOpacity style={styles.imagenModalOverlay} activeOpacity={1} onPress={() => setImagenAmpliada(null)}>
+          {imagenAmpliada && (
+            <Image source={{ uri: imagenAmpliada }} style={styles.imagenModalFull} contentFit="contain" />
+          )}
+          <TouchableOpacity style={styles.imagenModalCerrar} onPress={() => setImagenAmpliada(null)}>
+            <Icon name="close" size={28} color="#FFF" />
+          </TouchableOpacity>
+        </TouchableOpacity>
+      </Modal>
     </View>
   );
 }
@@ -290,6 +319,24 @@ const styles = StyleSheet.create({
   progressBarFill: { height: '100%', backgroundColor: ACCENT, borderRadius: 4 },
 
   scrollContent: { padding: 20, paddingBottom: 30 },
+  imagenPreguntaWrap: { borderRadius: 16, overflow: 'hidden', marginBottom: 16 },
+  imagenPregunta: { width: '100%', height: 200, backgroundColor: '#EEE' },
+  imagenZoomBadge: {
+    position: 'absolute',
+    bottom: 8,
+    right: 8,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    backgroundColor: 'rgba(0,0,0,0.55)',
+    borderRadius: 12,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+  },
+  imagenZoomText: { color: '#FFF', fontSize: 11, fontWeight: '600' },
+  imagenModalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.92)', justifyContent: 'center', alignItems: 'center' },
+  imagenModalFull: { width: '100%', height: '80%' },
+  imagenModalCerrar: { position: 'absolute', top: 50, right: 20, padding: 8 },
   preguntaCard: {
     backgroundColor: COLORS.card,
     borderRadius: 16,

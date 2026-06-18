@@ -121,7 +121,12 @@ export default function BibliotecaScreen() {
       </View>
 
       {/* Filtro por unidad */}
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.unidadRow}>
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        style={styles.unidadScroll}
+        contentContainerStyle={styles.unidadRow}
+      >
         <TouchableOpacity
           style={[styles.unidadChip, filtroUnidad === null && styles.unidadChipActivo]}
           onPress={() => setFiltroUnidad(null)}
@@ -244,7 +249,8 @@ const styles = StyleSheet.create({
   tipoChipText: { fontSize: 12, color: ACCENT, fontWeight: '600' },
   tipoChipTextActivo: { color: '#FFF' },
 
-  unidadRow: { paddingHorizontal: 20, paddingVertical: 12 },
+  unidadScroll: { flexGrow: 0, flexShrink: 0, height: 60 },
+  unidadRow: { paddingHorizontal: 20, paddingVertical: 12, alignItems: 'center' },
   unidadChip: {
     flexDirection: 'row',
     alignItems: 'center',

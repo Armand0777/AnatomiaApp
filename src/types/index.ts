@@ -89,6 +89,8 @@ export interface Pregunta {
   creado_por: string | null;
   created_at: string;
   updated_at: string;
+  // Imagen de referencia opcional (preguntas tipo "observe la imagen...")
+  imagen_url?: string | null;
 }
 
 export interface SesionEvaluacion {

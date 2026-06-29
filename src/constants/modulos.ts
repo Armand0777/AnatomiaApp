@@ -13,6 +13,7 @@ export const MODULOS: Record<string, ModuloVisual> = {
   biblioteca: { icon: 'play-box-multiple-outline', color: COLORS.secondary },
   autoevaluacion: { icon: 'clipboard-pulse-outline', color: '#673AB7' },
   panelDocente: { icon: 'shield-account-outline', color: '#C62828' },
+  gestion: { icon: 'cog-outline', color: '#455A64' },
   acercaDe: { icon: 'school-outline', color: '#757575' },
   perfil: { icon: 'account-circle-outline', color: '#0288D1' },
 };

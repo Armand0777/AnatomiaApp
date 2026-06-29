@@ -13,6 +13,8 @@ import PerfilScreen from '../screens/home/PerfilScreen';
 import AutoevaluacionScreen from '../screens/evaluacion/AutoevaluacionScreen';
 import BibliotecaScreen from '../screens/biblioteca/BibliotecaScreen';
 import AcercaDeScreen from '../screens/acercaDe/AcercaDeScreen';
+import GestionScreen from '../screens/gestion/GestionScreen';
+import { useRolAcceso } from '../hooks/useRolAcceso';
 
 import AdminNavigator from './AdminNavigator';
 
@@ -67,6 +69,7 @@ const CustomDrawerContent = (props: any) => {
 
 export default function DrawerNavigator() {
   const esDocente = useAuthStore(state => state.esDocente)();
+  const { puedeGestionar } = useRolAcceso();
 
   return (
     <Drawer.Navigator
@@ -105,6 +108,13 @@ export default function DrawerNavigator() {
           name="PanelDocente"
           component={AdminNavigator}
           options={{ drawerLabel: 'Panel Docente', drawerIcon: ({ focused }) => <DrawerIconBadge modulo="panelDocente" focused={focused} /> }}
+        />
+      )}
+      {puedeGestionar && (
+        <Drawer.Screen
+          name="Gestion"
+          component={GestionScreen}
+          options={{ drawerLabel: 'Gestión', drawerIcon: ({ focused }) => <DrawerIconBadge modulo="gestion" focused={focused} /> }}
         />
       )}
       <Drawer.Screen

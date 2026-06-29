@@ -12,6 +12,7 @@ import { useAuthStore } from './src/store/useAuthStore';
 import { COLORS } from './src/constants/colors';
 import { ejecutarSeed } from './src/services/seedService';
 import { poblarContenidoFaltante } from './src/services/forceSeed';
+import { initLocalDb } from './src/services/db/localDb';
 
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
@@ -21,9 +22,12 @@ export default function App() {
   useEffect(() => {
     const iniciarApp = async () => {
       try {
+        // Prepara la base local (modo offline) sin bloquear el resto del arranque
+        initLocalDb().catch((err) => console.error('Error al iniciar la base local:', err));
+
         // Al iniciar la aplicación, verificar si hay sesión activa
         await cargarSesion();
-        
+
         // El seeding solo debe ejecutarse en desarrollo local para desarrolladores
         // para evitar sobrecargar la base de datos y acelerar el inicio en producción
         if (__DEV__) {

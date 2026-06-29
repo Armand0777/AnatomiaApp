@@ -114,3 +114,25 @@ export interface ProgresoUsuario {
   ultima_visita: string;
   tiempo_segundos: number;
 }
+
+// Esquemas anatómicos interactivos (Biblioteca Multimedia)
+export interface EsquemaInteractivo {
+  id: string;
+  categoria: 'osteologia' | 'miologia';
+  tema_key: string;
+  titulo: string;
+  imagen_url: string | null;
+  orden: number;
+  activo: boolean;
+}
+
+export interface EtiquetaEsquema {
+  id: string;
+  esquema_id: string;
+  nombre: string;
+  descripcion: string;
+  icono: string | null;
+  pos_x: number;
+  pos_y: number;
+  orden: number;
+}

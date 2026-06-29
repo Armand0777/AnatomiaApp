@@ -16,6 +16,21 @@ import RevisionRespuestasScreen from '../screens/evaluacion/RevisionRespuestasSc
 import GestionPreguntasScreen from '../screens/evaluacion/GestionPreguntasScreen';
 import ReportesScreen from '../screens/evaluacion/ReportesScreen';
 
+// Submódulos de la Biblioteca Multimedia
+import GaleriaMultimediaScreen from '../screens/biblioteca/GaleriaMultimediaScreen';
+import VideosScreen from '../screens/biblioteca/VideosScreen';
+import VideoPlayerScreen from '../screens/biblioteca/VideoPlayerScreen';
+import EsquemasCategoriasScreen from '../screens/biblioteca/EsquemasCategoriasScreen';
+import EsquemasListaScreen from '../screens/biblioteca/EsquemasListaScreen';
+import EsquemaVisorScreen from '../screens/biblioteca/EsquemaVisorScreen';
+
+// Panel de Gestión de contenido (solo admin/docente)
+import GestionEsquemasScreen from '../screens/gestion/GestionEsquemasScreen';
+import GestionEtiquetasScreen from '../screens/gestion/GestionEtiquetasScreen';
+
+// Sub-pantalla de detalle de "Acerca de"
+import AcercaDetalleScreen from '../screens/acercaDe/AcercaDetalleScreen';
+
 const Stack = createStackNavigator();
 
 export default function AppNavigator() {
@@ -37,6 +52,21 @@ export default function AppNavigator() {
       <Stack.Screen name="RevisionRespuestas" component={RevisionRespuestasScreen} />
       <Stack.Screen name="GestionPreguntas" component={GestionPreguntasScreen} />
       <Stack.Screen name="Reportes" component={ReportesScreen} />
+
+      {/* Submódulos de la Biblioteca Multimedia */}
+      <Stack.Screen name="GaleriaMultimedia" component={GaleriaMultimediaScreen} />
+      <Stack.Screen name="Videos" component={VideosScreen} />
+      <Stack.Screen name="VideoPlayer" component={VideoPlayerScreen} />
+      <Stack.Screen name="EsquemasCategorias" component={EsquemasCategoriasScreen} />
+      <Stack.Screen name="EsquemasLista" component={EsquemasListaScreen} />
+      <Stack.Screen name="EsquemaVisor" component={EsquemaVisorScreen} />
+
+      {/* Panel de Gestión de contenido (solo admin/docente) */}
+      <Stack.Screen name="GestionEsquemas" component={GestionEsquemasScreen} />
+      <Stack.Screen name="GestionEtiquetas" component={GestionEtiquetasScreen} />
+
+      {/* Sub-pantalla de detalle de "Acerca de" */}
+      <Stack.Screen name="AcercaDetalle" component={AcercaDetalleScreen} />
     </Stack.Navigator>
   );
 }

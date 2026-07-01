@@ -5,12 +5,7 @@ import Icon from '@expo/vector-icons/MaterialCommunityIcons';
 import { COLORS } from '../../constants/colors';
 import { CATEGORIAS_ANATOMICAS } from '../../data/categoriasAnatomicas';
 
-// Solo Osteología y Miología tienen imágenes/etiquetas listas.
-// Órganos de los sentidos y Vías respiratorias están en la BD pero se
-// ocultan aquí hasta que tengan imagen. Los videos sí muestran las 4.
-const CATEGORIAS_ESQUEMAS = CATEGORIAS_ANATOMICAS.filter(
-  (c) => c.categoria === 'osteologia' || c.categoria === 'miologia'
-);
+const CATEGORIAS_ESQUEMAS = CATEGORIAS_ANATOMICAS;
 
 export default function EsquemasCategoriasScreen() {
   const navigation = useNavigation<any>();

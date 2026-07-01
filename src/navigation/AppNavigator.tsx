@@ -17,9 +17,9 @@ import GestionPreguntasScreen from '../screens/evaluacion/GestionPreguntasScreen
 import ReportesScreen from '../screens/evaluacion/ReportesScreen';
 
 // Submódulos de la Biblioteca Multimedia
-import GaleriaMultimediaScreen from '../screens/biblioteca/GaleriaMultimediaScreen';
 import VideosScreen from '../screens/biblioteca/VideosScreen';
 import VideoPlayerScreen from '../screens/biblioteca/VideoPlayerScreen';
+import VideosCategoriaScreen from '../screens/biblioteca/VideosCategoriaScreen';
 import EsquemasCategoriasScreen from '../screens/biblioteca/EsquemasCategoriasScreen';
 import EsquemasListaScreen from '../screens/biblioteca/EsquemasListaScreen';
 import EsquemaVisorScreen from '../screens/biblioteca/EsquemaVisorScreen';
@@ -54,8 +54,8 @@ export default function AppNavigator() {
       <Stack.Screen name="Reportes" component={ReportesScreen} />
 
       {/* Submódulos de la Biblioteca Multimedia */}
-      <Stack.Screen name="GaleriaMultimedia" component={GaleriaMultimediaScreen} />
       <Stack.Screen name="Videos" component={VideosScreen} />
+      <Stack.Screen name="VideosCategoria" component={VideosCategoriaScreen} />
       <Stack.Screen name="VideoPlayer" component={VideoPlayerScreen} />
       <Stack.Screen name="EsquemasCategorias" component={EsquemasCategoriasScreen} />
       <Stack.Screen name="EsquemasLista" component={EsquemasListaScreen} />

@@ -64,7 +64,7 @@ export default function TemasScreen() {
             <View style={[styles.iconWrapper, { backgroundColor: visual.color + '26' }]}>
               <Icon name={visual.icon as any} size={22} color={visual.color} />
             </View>
-            <Text style={styles.temaTitle}>{item.orden}. {item.titulo}</Text>
+            <Text style={styles.temaTitle}>{item.titulo}</Text>
             <Icon name="chevron-right" size={24} color={COLORS.primary} />
           </TouchableOpacity>
         )}

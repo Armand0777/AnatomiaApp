@@ -4,6 +4,7 @@ import { useNavigation, useRoute } from '@react-navigation/native';
 import Icon from '@expo/vector-icons/MaterialCommunityIcons';
 import { COLORS } from '../../constants/colors';
 import { CategoriaEsquema } from '../../data/esquemasData';
+import { CATEGORIAS_ANATOMICAS } from '../../data/categoriasAnatomicas';
 import { esquemasService } from '../../services/esquemasService';
 import { EsquemaInteractivo } from '../../types';
 
@@ -11,11 +12,6 @@ interface ListaParams {
   categoria: CategoriaEsquema;
   titulo: string;
 }
-
-const EMOJI_POR_CATEGORIA: Record<CategoriaEsquema, string> = {
-  osteologia: '🦴',
-  miologia: '💪',
-};
 
 // Lee las láminas reales desde Supabase (antes era una lista fija), así los
 // cambios que haga el docente desde Gestión se reflejan aquí.
@@ -41,7 +37,7 @@ export default function EsquemasListaScreen() {
     () => esquemas.filter((e) => e.categoria === categoria && e.activo).sort((a, b) => a.orden - b.orden),
     [esquemas, categoria]
   );
-  const emoji = EMOJI_POR_CATEGORIA[categoria] ?? '🧩';
+  const emoji = CATEGORIAS_ANATOMICAS.find((c) => c.categoria === categoria)?.icono ?? '🧩';
 
   return (
     <View style={styles.container}>

@@ -1,52 +1,79 @@
-import React, { useCallback, useEffect, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, ActivityIndicator, Dimensions } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Dimensions, Linking, Alert, ActivityIndicator } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
-import { Image } from 'expo-image';
 import YoutubePlayer from 'react-native-youtube-iframe';
+import * as FileSystem from 'expo-file-system/legacy';
+import * as Sharing from 'expo-sharing';
 import Icon from '@expo/vector-icons/MaterialCommunityIcons';
 import { COLORS } from '../../constants/colors';
-import { unidadesService, MultimediaConTema } from '../../services/unidadesService';
-import { extraerYoutubeId } from '../../utils/youtube';
+import { VideoBiblioteca } from '../../types';
 
-const NUMEROS_ROMANOS = ['I', 'II', 'III', 'IV', 'V'];
 const { width } = Dimensions.get('window');
 
+type Pestana = 'descripcion' | 'contenido' | 'descarga';
+
 interface PlayerParams {
-  video: MultimediaConTema;
+  video: VideoBiblioteca;
+}
+
+// Descarga un archivo remoto al dispositivo y abre el panel de compartir
+// (así el usuario decide dónde guardarlo o con qué app abrirlo).
+async function descargarYCompartir(url: string, nombreArchivo: string) {
+  try {
+    const destino = `${FileSystem.documentDirectory}${nombreArchivo}`;
+    const resultado = await FileSystem.downloadAsync(url, destino);
+    const disponible = await Sharing.isAvailableAsync();
+    if (disponible) {
+      await Sharing.shareAsync(resultado.uri);
+    } else {
+      Alert.alert('Descargado', `El archivo se guardó en ${resultado.uri}`);
+    }
+  } catch (error) {
+    console.error('Error al descargar el archivo:', error);
+    Alert.alert('Error', 'No se pudo descargar el archivo. Verifica tu conexión.');
+  }
 }
 
 export default function VideoPlayerScreen() {
   const navigation = useNavigation<any>();
   const route = useRoute<any>();
-  const { video: videoInicial } = (route.params ?? {}) as PlayerParams;
+  const { video } = (route.params ?? {}) as PlayerParams;
 
-  const [videoActual, setVideoActual] = useState<MultimediaConTema>(videoInicial);
   const [playing, setPlaying] = useState(true);
-  const [otrosVideos, setOtrosVideos] = useState<MultimediaConTema[]>([]);
-  const [cargando, setCargando] = useState(true);
+  const [favorito, setFavorito] = useState(false);
+  const [pestana, setPestana] = useState<Pestana>('descripcion');
+  const [descargando, setDescargando] = useState<'mp4' | 'jpg' | 'pdf' | null>(null);
 
-  const unidadId = videoInicial.temas?.unidad_id;
-
-  const cargarOtrosVideos = useCallback(async () => {
-    setCargando(true);
-    const todos = await unidadesService.getBibliotecaMultimedia();
-    setOtrosVideos(
-      todos.filter((m) => m.tipo === 'video' && m.temas?.unidad_id === unidadId && m.id !== videoInicial.id)
-    );
-    setCargando(false);
-  }, [videoInicial.id, unidadId]);
-
-  useEffect(() => {
-    cargarOtrosVideos();
-  }, [cargarOtrosVideos]);
-
-  const onStateChange = useCallback((estado: string) => {
+  const onStateChange = (estado: string) => {
     if (estado === 'ended') setPlaying(false);
-  }, []);
+  };
 
-  const seleccionarOtroVideo = (video: MultimediaConTema) => {
-    setVideoActual(video);
-    setPlaying(true);
+  const verEnYoutube = () => {
+    if (video.youtube_id) Linking.openURL(`https://www.youtube.com/watch?v=${video.youtube_id}`);
+  };
+
+  const descargarVideo = async () => {
+    if (video.video_mp4_url) {
+      setDescargando('mp4');
+      await descargarYCompartir(video.video_mp4_url, `${video.tema}.mp4`);
+      setDescargando(null);
+    } else {
+      verEnYoutube();
+    }
+  };
+
+  const descargarImagen = async () => {
+    if (!video.imagen_descarga_url) return;
+    setDescargando('jpg');
+    await descargarYCompartir(video.imagen_descarga_url, `${video.tema}.jpg`);
+    setDescargando(null);
+  };
+
+  const descargarPdf = async () => {
+    if (!video.pdf_resumen_url) return;
+    setDescargando('pdf');
+    await descargarYCompartir(video.pdf_resumen_url, `${video.tema}.pdf`);
+    setDescargando(null);
   };
 
   return (
@@ -56,64 +83,108 @@ export default function VideoPlayerScreen() {
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.headerBtn}>
           <Icon name="chevron-left" size={26} color="#FFF" />
         </TouchableOpacity>
-        <Text style={styles.headerTitle} numberOfLines={1}>{videoActual.titulo || 'Video'}</Text>
-        <View style={{ width: 26 }} />
+        <Text style={styles.headerTitle} numberOfLines={1}>{video.tema}</Text>
+        <TouchableOpacity onPress={() => setFavorito((v) => !v)} style={styles.headerBtn}>
+          <Icon name={favorito ? 'heart' : 'heart-outline'} size={24} color="#FFF" />
+        </TouchableOpacity>
       </View>
 
       {/* Reproductor */}
       <View style={styles.playerWrap}>
-        <YoutubePlayer
-          height={220}
-          width={width}
-          play={playing}
-          videoId={extraerYoutubeId(videoActual.url)}
-          onChangeState={onStateChange}
-        />
+        {video.youtube_id ? (
+          <YoutubePlayer height={220} width={width} play={playing} videoId={video.youtube_id} onChangeState={onStateChange} />
+        ) : (
+          <View style={styles.sinVideo}>
+            <Icon name="video-off-outline" size={40} color="#888" />
+            <Text style={styles.sinVideoTexto}>Sin video disponible</Text>
+          </View>
+        )}
+      </View>
+
+      {/* Pestañas */}
+      <View style={styles.tabsRow}>
+        {(
+          [
+            { key: 'descripcion', label: 'Descripción' },
+            { key: 'contenido', label: 'Contenido' },
+            { key: 'descarga', label: 'Descarga' },
+          ] as { key: Pestana; label: string }[]
+        ).map((tab) => {
+          const activa = pestana === tab.key;
+          return (
+            <TouchableOpacity key={tab.key} style={[styles.tab, activa && styles.tabActiva]} onPress={() => setPestana(tab.key)}>
+              <Text style={[styles.tabTexto, activa && styles.tabTextoActiva]}>{tab.label}</Text>
+            </TouchableOpacity>
+          );
+        })}
       </View>
 
       <ScrollView contentContainerStyle={styles.contenido}>
-        <Text style={styles.titulo}>{videoActual.titulo || 'Video'}</Text>
-        <View style={styles.metaRow}>
-          {videoActual.temas?.unidades && (
-            <View style={styles.unidadBadge}>
-              <Text style={styles.unidadBadgeTexto}>
-                Unidad {NUMEROS_ROMANOS[videoActual.temas.unidades.numero - 1] || videoActual.temas.unidades.numero}
+        {pestana === 'descripcion' && (
+          <Text style={styles.parrafo}>
+            En este video aprenderás sobre {video.tema.toLowerCase()}, su ubicación y características principales
+            dentro de la anatomía de cabeza y cuello.
+          </Text>
+        )}
+
+        {pestana === 'contenido' && (
+          <Text style={styles.parrafo}>
+            Próximamente: puntos clave y estructuras detalladas de {video.tema.toLowerCase()}.
+          </Text>
+        )}
+
+        {pestana === 'descarga' && (
+          <View>
+            <TouchableOpacity style={styles.descargaFila} onPress={descargarVideo} disabled={descargando !== null}>
+              <Icon name="movie-outline" size={22} color={COLORS.primary} />
+              <Text style={styles.descargaTexto}>
+                {video.video_mp4_url ? 'Descargar video explicativo (MP4)' : 'Ver en YouTube'}
               </Text>
-            </View>
-          )}
-          {videoActual.temas && <Text style={styles.temaTexto}>{videoActual.temas.titulo}</Text>}
-        </View>
-        {videoActual.descripcion && <Text style={styles.descripcion}>{videoActual.descripcion}</Text>}
+              {descargando === 'mp4' ? (
+                <ActivityIndicator size="small" color={COLORS.primary} />
+              ) : (
+                <Icon name={video.video_mp4_url ? 'download' : 'open-in-new'} size={20} color={COLORS.primary} />
+              )}
+            </TouchableOpacity>
 
-        <Text style={styles.seccionTitulo}>Más videos de esta unidad</Text>
+            <TouchableOpacity
+              style={[styles.descargaFila, !video.imagen_descarga_url && styles.descargaFilaDeshabilitada]}
+              onPress={descargarImagen}
+              disabled={!video.imagen_descarga_url || descargando !== null}
+            >
+              <Icon name="image-outline" size={22} color={video.imagen_descarga_url ? COLORS.primary : '#AAA'} />
+              <View style={{ flex: 1 }}>
+                <Text style={[styles.descargaTexto, !video.imagen_descarga_url && styles.descargaTextoDeshabilitado]}>
+                  Descargar esquema anatómico integral
+                </Text>
+                {!video.imagen_descarga_url && <Text style={styles.proximamenteTexto}>Disponible próximamente</Text>}
+              </View>
+              {descargando === 'jpg' ? (
+                <ActivityIndicator size="small" color={COLORS.primary} />
+              ) : (
+                <Icon name="download" size={20} color={video.imagen_descarga_url ? COLORS.primary : '#AAA'} />
+              )}
+            </TouchableOpacity>
 
-        {cargando ? (
-          <ActivityIndicator color={COLORS.primary} style={{ marginTop: 10 }} />
-        ) : otrosVideos.length === 0 ? (
-          <Text style={styles.vacioTexto}>No hay más videos en esta unidad todavía.</Text>
-        ) : (
-          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-            {otrosVideos.map((video) => (
-              <TouchableOpacity
-                key={video.id}
-                style={styles.otroVideoCard}
-                activeOpacity={0.85}
-                onPress={() => seleccionarOtroVideo(video)}
-              >
-                <View style={styles.otroMiniaturaWrap}>
-                  <Image
-                    source={{ uri: `https://img.youtube.com/vi/${extraerYoutubeId(video.url)}/hqdefault.jpg` }}
-                    style={styles.otroMiniatura}
-                    contentFit="cover"
-                  />
-                  <View style={styles.playBadge}>
-                    <Icon name="play" size={14} color="#FFF" />
-                  </View>
-                </View>
-                <Text style={styles.otroVideoTitulo} numberOfLines={2}>{video.titulo || 'Video'}</Text>
-              </TouchableOpacity>
-            ))}
-          </ScrollView>
+            <TouchableOpacity
+              style={[styles.descargaFila, !video.pdf_resumen_url && styles.descargaFilaDeshabilitada]}
+              onPress={descargarPdf}
+              disabled={!video.pdf_resumen_url || descargando !== null}
+            >
+              <Icon name="file-pdf-box" size={22} color={video.pdf_resumen_url ? COLORS.primary : '#AAA'} />
+              <View style={{ flex: 1 }}>
+                <Text style={[styles.descargaTexto, !video.pdf_resumen_url && styles.descargaTextoDeshabilitado]}>
+                  Descargar resumen educativo (PDF)
+                </Text>
+                {!video.pdf_resumen_url && <Text style={styles.proximamenteTexto}>Disponible próximamente</Text>}
+              </View>
+              {descargando === 'pdf' ? (
+                <ActivityIndicator size="small" color={COLORS.primary} />
+              ) : (
+                <Icon name="download" size={20} color={video.pdf_resumen_url ? COLORS.primary : '#AAA'} />
+              )}
+            </TouchableOpacity>
+          </View>
         )}
       </ScrollView>
     </View>
@@ -134,34 +205,32 @@ const styles = StyleSheet.create({
   headerBtn: { padding: 4 },
   headerTitle: { color: COLORS.headerText, fontSize: 16, fontWeight: 'bold', flex: 1, textAlign: 'center' },
 
-  playerWrap: { width: '100%', height: 220, backgroundColor: '#000' },
+  playerWrap: { width: '100%', height: 220, backgroundColor: '#000', justifyContent: 'center' },
+  sinVideo: { alignItems: 'center' },
+  sinVideoTexto: { color: '#888', marginTop: 8, fontSize: 13 },
+
+  tabsRow: { flexDirection: 'row', borderBottomWidth: 1, borderBottomColor: COLORS.border },
+  tab: { flex: 1, paddingVertical: 14, alignItems: 'center', borderBottomWidth: 2, borderBottomColor: 'transparent' },
+  tabActiva: { borderBottomColor: COLORS.primary },
+  tabTexto: { fontSize: 13.5, color: '#888', fontWeight: '600' },
+  tabTextoActiva: { color: COLORS.primary },
 
   contenido: { padding: 20, paddingBottom: 40 },
-  titulo: { fontSize: 18, fontWeight: 'bold', color: COLORS.textPrimary, marginBottom: 8 },
-  metaRow: { flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 12 },
-  unidadBadge: { backgroundColor: COLORS.primary + '1A', borderRadius: 10, paddingHorizontal: 8, paddingVertical: 3 },
-  unidadBadgeTexto: { fontSize: 11, color: COLORS.primary, fontWeight: '700' },
-  temaTexto: { fontSize: 12, color: '#888' },
-  descripcion: { fontSize: 14, color: '#444', lineHeight: 20, marginBottom: 24 },
+  parrafo: { fontSize: 15, color: COLORS.textPrimary, lineHeight: 22 },
 
-  seccionTitulo: { fontSize: 15, fontWeight: 'bold', color: COLORS.textPrimary, marginBottom: 12 },
-  vacioTexto: { color: '#888', fontSize: 13 },
-
-  otroVideoCard: { width: 160, marginRight: 14 },
-  otroMiniaturaWrap: { width: '100%', height: 90, borderRadius: 10, overflow: 'hidden', position: 'relative' },
-  otroMiniatura: { width: '100%', height: '100%', backgroundColor: '#DDD' },
-  playBadge: {
-    position: 'absolute',
-    top: '50%',
-    left: '50%',
-    marginTop: -14,
-    marginLeft: -14,
-    width: 28,
-    height: 28,
-    borderRadius: 14,
-    backgroundColor: 'rgba(0,0,0,0.55)',
-    justifyContent: 'center',
+  descargaFila: {
+    flexDirection: 'row',
     alignItems: 'center',
+    gap: 12,
+    backgroundColor: COLORS.card,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    borderRadius: 14,
+    padding: 14,
+    marginBottom: 12,
   },
-  otroVideoTitulo: { fontSize: 12.5, color: COLORS.textPrimary, marginTop: 6, fontWeight: '600' },
+  descargaFilaDeshabilitada: { opacity: 0.7 },
+  descargaTexto: { flex: 1, fontSize: 14, fontWeight: '600', color: COLORS.textPrimary },
+  descargaTextoDeshabilitado: { color: '#999' },
+  proximamenteTexto: { fontSize: 11, color: '#AAA', marginTop: 2, fontStyle: 'italic' },
 });

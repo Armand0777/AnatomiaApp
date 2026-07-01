@@ -80,6 +80,11 @@ export default function AcercaDetalleScreen() {
             ))}
           </View>
         )}
+
+        <TouchableOpacity style={styles.volverBtn} onPress={() => navigation.goBack()}>
+          <Icon name="arrow-left" size={18} color={COLORS.primary} />
+          <Text style={styles.volverBtnTexto}>Volver al menú</Text>
+        </TouchableOpacity>
       </View>
     </ScrollView>
   );
@@ -133,4 +138,18 @@ const styles = StyleSheet.create({
   referenciaTexto: { flex: 1, fontSize: 14, color: COLORS.textPrimary, lineHeight: 20 },
 
   noEncontrado: { textAlign: 'center', marginTop: 40, color: '#888' },
+
+  volverBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    borderWidth: 1.5,
+    borderColor: COLORS.primary,
+    borderRadius: 12,
+    paddingVertical: 13,
+    width: '100%',
+    marginTop: 24,
+  },
+  volverBtnTexto: { color: COLORS.primary, fontSize: 14.5, fontWeight: 'bold' },
 });

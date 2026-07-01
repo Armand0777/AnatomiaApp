@@ -1,10 +1,10 @@
 import * as FileSystem from 'expo-file-system/legacy';
 import { decode } from 'base64-arraybuffer';
 import { supabase } from './supabase';
-import { EsquemaInteractivo, EtiquetaEsquema } from '../types';
+import { EsquemaInteractivo, EtiquetaEsquema, CategoriaAnatomica } from '../types';
 
 export interface NuevoEsquema {
-  categoria: 'osteologia' | 'miologia';
+  categoria: CategoriaAnatomica;
   tema_key: string;
   titulo: string;
   imagen_url: string | null;

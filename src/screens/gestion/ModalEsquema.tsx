@@ -18,13 +18,9 @@ import Icon from '@expo/vector-icons/MaterialCommunityIcons';
 import { COLORS } from '../../constants/colors';
 import { esquemasService, NuevoEsquema } from '../../services/esquemasService';
 import { generarSlug } from '../../utils/texto';
-import { EsquemaInteractivo } from '../../types';
+import { EsquemaInteractivo, CategoriaAnatomica } from '../../types';
 import { IMAGENES_ESQUEMAS } from '../../data/imagenesEsquemas';
-
-const CATEGORIAS: { valor: 'osteologia' | 'miologia'; etiqueta: string }[] = [
-  { valor: 'osteologia', etiqueta: 'Osteología' },
-  { valor: 'miologia', etiqueta: 'Miología' },
-];
+import { CATEGORIAS_ANATOMICAS } from '../../data/categoriasAnatomicas';
 
 interface ModalEsquemaProps {
   visible: boolean;
@@ -39,7 +35,7 @@ interface ModalEsquemaProps {
 export default function ModalEsquema({ visible, esquemaEditando, esquemasExistentes, onCerrar, onGuardado }: ModalEsquemaProps) {
   const editando = !!esquemaEditando;
 
-  const [categoria, setCategoria] = useState<'osteologia' | 'miologia'>('osteologia');
+  const [categoria, setCategoria] = useState<CategoriaAnatomica>('osteologia');
   const [titulo, setTitulo] = useState('');
   const [orden, setOrden] = useState('1');
   const [imagenUri, setImagenUri] = useState<string | null>(null);
@@ -144,16 +140,18 @@ export default function ModalEsquema({ visible, esquemaEditando, esquemasExisten
         <ScrollView contentContainerStyle={styles.contenido}>
           <Text style={styles.label}>Categoría</Text>
           <View style={styles.categoriasRow}>
-            {CATEGORIAS.map((c) => {
-              const activa = categoria === c.valor;
+            {CATEGORIAS_ANATOMICAS.map((c) => {
+              const activa = categoria === c.categoria;
               return (
                 <TouchableOpacity
-                  key={c.valor}
+                  key={c.categoria}
                   style={[styles.categoriaChip, activa && styles.categoriaChipActiva, editando && styles.deshabilitado]}
-                  onPress={() => !editando && setCategoria(c.valor)}
+                  onPress={() => !editando && setCategoria(c.categoria)}
                   disabled={editando}
                 >
-                  <Text style={[styles.categoriaChipTexto, activa && styles.categoriaChipTextoActiva]}>{c.etiqueta}</Text>
+                  <Text style={[styles.categoriaChipTexto, activa && styles.categoriaChipTextoActiva]}>
+                    {c.icono} {c.titulo}
+                  </Text>
                 </TouchableOpacity>
               );
             })}
@@ -203,7 +201,7 @@ const styles = StyleSheet.create({
   label: { fontSize: 14, fontWeight: 'bold', color: '#444', marginBottom: 8, marginTop: 16 },
   input: { backgroundColor: '#F9F9F9', borderWidth: 1, borderColor: '#DDD', borderRadius: 8, padding: 12, fontSize: 15 },
 
-  categoriasRow: { flexDirection: 'row', gap: 8 },
+  categoriasRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   categoriaChip: { borderWidth: 1, borderColor: COLORS.border, borderRadius: 18, paddingHorizontal: 14, paddingVertical: 8, backgroundColor: '#FFF' },
   categoriaChipActiva: { backgroundColor: COLORS.primary, borderColor: COLORS.primary },
   categoriaChipTexto: { color: COLORS.primary, fontSize: 13, fontWeight: '600' },

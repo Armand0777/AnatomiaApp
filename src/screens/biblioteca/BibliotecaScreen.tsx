@@ -16,12 +16,6 @@ interface TarjetaModulo {
 
 const MODULOS_BIBLIOTECA: TarjetaModulo[] = [
   {
-    icon: 'image-multiple-outline',
-    titulo: 'Galería multimedia',
-    descripcion: 'Fotos y videos subidos por los docentes para cada tema.',
-    ruta: 'GaleriaMultimedia',
-  },
-  {
     icon: 'movie-open-outline',
     titulo: 'Videos explicativos de anatomía',
     descripcion: 'Accede a videos educativos organizados por categorías anatómicas.',
@@ -35,7 +29,7 @@ const MODULOS_BIBLIOTECA: TarjetaModulo[] = [
   },
 ];
 
-// Centro de navegación de la Biblioteca Multimedia: agrupa los 3 sub-módulos
+// Centro de navegación de la Biblioteca Multimedia: agrupa los 2 sub-módulos
 export default function BibliotecaScreen() {
   const navigation = useNavigation<any>();
 

@@ -115,10 +115,13 @@ export interface ProgresoUsuario {
   tiempo_segundos: number;
 }
 
+// Las 4 categorías temáticas que comparten Esquemas y Videos de la Biblioteca
+export type CategoriaAnatomica = 'osteologia' | 'miologia' | 'organos_sentidos' | 'vias_respiratorias';
+
 // Esquemas anatómicos interactivos (Biblioteca Multimedia)
 export interface EsquemaInteractivo {
   id: string;
-  categoria: 'osteologia' | 'miologia';
+  categoria: CategoriaAnatomica;
   tema_key: string;
   titulo: string;
   imagen_url: string | null;
@@ -135,4 +138,19 @@ export interface EtiquetaEsquema {
   pos_x: number;
   pos_y: number;
   orden: number;
+}
+
+// Videos explicativos de la Biblioteca, organizados por categoría temática
+// (igual que los esquemas), con recursos descargables opcionales.
+export interface VideoBiblioteca {
+  id: string;
+  categoria: CategoriaAnatomica;
+  tema: string;
+  youtube_id: string | null;
+  duracion: string | null;
+  imagen_descarga_url: string | null;
+  pdf_resumen_url: string | null;
+  video_mp4_url: string | null;
+  orden: number;
+  activo: boolean;
 }

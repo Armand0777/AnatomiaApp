@@ -54,7 +54,7 @@ export default function AdminTemasScreen() {
       onPress={() => navigation.navigate('AdminContenido', { temaId: item.id, temaTitulo: item.titulo })}
     >
       <View style={styles.cardContent}>
-        <Text style={styles.cardTitle}>{item.orden}. {item.titulo}</Text>
+        <Text style={styles.cardTitle}>{item.titulo}</Text>
       </View>
       <TouchableOpacity onPress={() => handleEliminarTema(item.id)} style={styles.deleteBtn}>
         <Icon name="delete" size={24} color={COLORS.error} />

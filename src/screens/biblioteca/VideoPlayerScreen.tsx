@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Dimensions, Linki
 import { useNavigation, useRoute } from '@react-navigation/native';
 import YoutubePlayer from 'react-native-youtube-iframe';
 import * as FileSystem from 'expo-file-system/legacy';
+import * as Sharing from 'expo-sharing';
 import * as MediaLibrary from 'expo-media-library';
 import Icon from '@expo/vector-icons/MaterialCommunityIcons';
 import { COLORS } from '../../constants/colors';
@@ -34,18 +35,24 @@ async function guardarImagenEnGaleria(url: string, nombreArchivo: string) {
   }
 }
 
-// Abre el PDF en el navegador del dispositivo, que lo descarga automáticamente.
-async function abrirPdfEnNavegador(url: string) {
+// Descarga el PDF al almacenamiento del dispositivo y lo abre con la app predeterminada.
+async function descargarPdfAlDispositivo(url: string, nombreArchivo: string) {
   try {
-    const soportado = await Linking.canOpenURL(url);
-    if (soportado) {
-      await Linking.openURL(url);
+    const destino = `${FileSystem.documentDirectory}${nombreArchivo}`;
+    const { uri, status } = await FileSystem.downloadAsync(url, destino);
+    if (status !== 200) {
+      Alert.alert('Archivo no disponible', 'El PDF aún no ha sido subido al servidor. Inténtalo más tarde.');
+      return;
+    }
+    const disponible = await Sharing.isAvailableAsync();
+    if (disponible) {
+      await Sharing.shareAsync(uri, { mimeType: 'application/pdf', dialogTitle: 'Abrir PDF con...' });
     } else {
-      Alert.alert('Error', 'No se pudo abrir el PDF.');
+      Alert.alert('Descargado', `PDF guardado en el dispositivo.`);
     }
   } catch (error) {
-    console.error('Error al abrir el PDF:', error);
-    Alert.alert('Error', 'No se pudo abrir el PDF. Verifica tu conexión.');
+    console.error('Error al descargar el PDF:', error);
+    Alert.alert('Archivo no disponible', 'No se pudo descargar el PDF. Verifica que el archivo esté subido en Supabase Storage.');
   }
 }
 
@@ -87,7 +94,7 @@ export default function VideoPlayerScreen() {
   const descargarPdf = async () => {
     if (!video.pdf_resumen_url) return;
     setDescargando('pdf');
-    await abrirPdfEnNavegador(video.pdf_resumen_url);
+    await descargarPdfAlDispositivo(video.pdf_resumen_url, `${video.tema}.pdf`);
     setDescargando(null);
   };
 

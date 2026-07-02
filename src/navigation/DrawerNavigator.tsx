@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, Image } from 'react-native';
+import { View, Text, StyleSheet, Image, TouchableOpacity, BackHandler, Platform } from 'react-native';
 import { createDrawerNavigator, DrawerContentScrollView, DrawerItemList } from '@react-navigation/drawer';
 import Icon from '@expo/vector-icons/MaterialCommunityIcons';
 import { COLORS } from '../constants/colors';
@@ -52,6 +52,13 @@ const CustomDrawerContent = (props: any) => {
       <DrawerContentScrollView {...props} contentContainerStyle={styles.scrollContent}>
         <DrawerItemList {...props} />
       </DrawerContentScrollView>
+
+      {Platform.OS === 'android' && (
+        <TouchableOpacity style={styles.salirBtn} onPress={() => BackHandler.exitApp()}>
+          <Icon name="exit-to-app" size={20} color="#E53935" />
+          <Text style={styles.salirTexto}>Salir de la aplicación</Text>
+        </TouchableOpacity>
+      )}
 
       <View style={styles.drawerFooter}>
         <View style={styles.avatar}>
@@ -194,5 +201,23 @@ const styles = StyleSheet.create({
   footerEmail: {
     fontSize: 12,
     color: '#777',
-  }
+  },
+  salirBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    marginHorizontal: 16,
+    marginBottom: 8,
+    paddingVertical: 12,
+    paddingHorizontal: 14,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#FFCDD2',
+    backgroundColor: '#FFF5F5',
+  },
+  salirTexto: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#E53935',
+  },
 });

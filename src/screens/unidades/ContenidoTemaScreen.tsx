@@ -231,7 +231,7 @@ export default function ContenidoTemaScreen() {
           onPress={() => navigation.navigate('Video', { ...sharedNavParams })}
         >
           <Icon name="play-circle-outline" size={24} color={COLORS.primary} />
-          <Text style={styles.bottomBtnText}>Ver video</Text>
+          <Text style={styles.bottomBtnText}>Ver videos</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.bottomBtn}

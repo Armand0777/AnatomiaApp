@@ -150,16 +150,6 @@ export default function VideoPlayerScreen() {
 
         {pestana === 'descarga' && (
           <View>
-            <TouchableOpacity style={styles.descargaFila} onPress={descargarVideo} disabled={descargando !== null}>
-              <Icon name="movie-outline" size={22} color={COLORS.primary} />
-              <Text style={styles.descargaTexto}>Descargar video explicativo</Text>
-              {descargando === 'mp4' ? (
-                <ActivityIndicator size="small" color={COLORS.primary} />
-              ) : (
-                <Icon name="download" size={20} color={COLORS.primary} />
-              )}
-            </TouchableOpacity>
-
             <TouchableOpacity
               style={[styles.descargaFila, !video.imagen_descarga_url && styles.descargaFilaDeshabilitada]}
               onPress={descargarImagen}

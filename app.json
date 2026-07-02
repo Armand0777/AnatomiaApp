@@ -27,6 +27,14 @@
       "expo-video",
       "expo-font",
       [
+        "expo-media-library",
+        {
+          "photosPermission": "Necesitamos acceso a tu galería para guardar los esquemas anatómicos.",
+          "savePhotosPermission": "Necesitamos permiso para guardar imágenes en tu galería.",
+          "isAccessMediaLocationEnabled": false
+        }
+      ],
+      [
         "expo-splash-screen",
         {
           "image": "./assets/logocentral.png",

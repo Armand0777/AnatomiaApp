@@ -10,6 +10,7 @@ import {
   ActivityIndicator
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import Icon from '@expo/vector-icons/MaterialCommunityIcons';
 import { COLORS } from '../../constants/colors';
 import { useAuthStore } from '../../store/useAuthStore';
 
@@ -19,6 +20,7 @@ export default function LoginScreen() {
   const [nombre, setNombre] = useState('');
   const [password, setPassword] = useState('');
   const [isRegistering, setIsRegistering] = useState(false);
+  const [verPassword, setVerPassword] = useState(false);
   
   const login = useAuthStore(state => state.login);
   const register = useAuthStore(state => state.register);
@@ -82,14 +84,19 @@ export default function LoginScreen() {
 
         <View style={styles.inputGroup}>
           <Text style={styles.label}>Contraseña</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="********"
-            placeholderTextColor={COLORS.textSecondary}
-            value={password}
-            onChangeText={setPassword}
-            secureTextEntry
-          />
+          <View style={styles.passwordWrap}>
+            <TextInput
+              style={styles.passwordInput}
+              placeholder="********"
+              placeholderTextColor={COLORS.textSecondary}
+              value={password}
+              onChangeText={setPassword}
+              secureTextEntry={!verPassword}
+            />
+            <TouchableOpacity onPress={() => setVerPassword(v => !v)} style={styles.ojito}>
+              <Icon name={verPassword ? 'eye-off-outline' : 'eye-outline'} size={22} color={COLORS.textSecondary} />
+            </TouchableOpacity>
+          </View>
         </View>
 
         <TouchableOpacity 
@@ -174,6 +181,24 @@ const styles = StyleSheet.create({
     padding: 16,
     fontSize: 16,
     color: COLORS.textPrimary,
+  },
+  passwordWrap: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: COLORS.card,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    borderRadius: 12,
+  },
+  passwordInput: {
+    flex: 1,
+    padding: 16,
+    fontSize: 16,
+    color: COLORS.textPrimary,
+  },
+  ojito: {
+    paddingHorizontal: 14,
+    paddingVertical: 16,
   },
   loginButton: {
     backgroundColor: COLORS.buttonPrimaryBg,

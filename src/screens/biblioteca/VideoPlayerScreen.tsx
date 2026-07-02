@@ -3,34 +3,49 @@ import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Dimensions, Linki
 import { useNavigation, useRoute } from '@react-navigation/native';
 import YoutubePlayer from 'react-native-youtube-iframe';
 import * as FileSystem from 'expo-file-system/legacy';
-import * as Sharing from 'expo-sharing';
+import * as MediaLibrary from 'expo-media-library';
 import Icon from '@expo/vector-icons/MaterialCommunityIcons';
 import { COLORS } from '../../constants/colors';
 import { VideoBiblioteca } from '../../types';
 
 const { width } = Dimensions.get('window');
 
-type Pestana = 'descripcion' | 'contenido' | 'descarga';
+type Pestana = 'descripcion' | 'descarga';
 
 interface PlayerParams {
   video: VideoBiblioteca;
 }
 
-// Descarga un archivo remoto al dispositivo y abre el panel de compartir
-// (así el usuario decide dónde guardarlo o con qué app abrirlo).
-async function descargarYCompartir(url: string, nombreArchivo: string) {
+// Descarga una imagen y la guarda directamente en la galería del dispositivo.
+async function guardarImagenEnGaleria(url: string, nombreArchivo: string) {
   try {
-    const destino = `${FileSystem.documentDirectory}${nombreArchivo}`;
-    const resultado = await FileSystem.downloadAsync(url, destino);
-    const disponible = await Sharing.isAvailableAsync();
-    if (disponible) {
-      await Sharing.shareAsync(resultado.uri);
+    const { status } = await MediaLibrary.requestPermissionsAsync();
+    if (status !== 'granted') {
+      Alert.alert('Permiso denegado', 'Necesitamos acceso a tu galería para guardar la imagen.');
+      return;
+    }
+    const destino = `${FileSystem.cacheDirectory}${nombreArchivo}`;
+    const { uri } = await FileSystem.downloadAsync(url, destino);
+    await MediaLibrary.saveToLibraryAsync(uri);
+    Alert.alert('✓ Guardado', 'La imagen se guardó en tu galería.');
+  } catch (error) {
+    console.error('Error al guardar la imagen:', error);
+    Alert.alert('Error', 'No se pudo descargar la imagen. Verifica tu conexión.');
+  }
+}
+
+// Abre el PDF en el navegador del dispositivo, que lo descarga automáticamente.
+async function abrirPdfEnNavegador(url: string) {
+  try {
+    const soportado = await Linking.canOpenURL(url);
+    if (soportado) {
+      await Linking.openURL(url);
     } else {
-      Alert.alert('Descargado', `El archivo se guardó en ${resultado.uri}`);
+      Alert.alert('Error', 'No se pudo abrir el PDF.');
     }
   } catch (error) {
-    console.error('Error al descargar el archivo:', error);
-    Alert.alert('Error', 'No se pudo descargar el archivo. Verifica tu conexión.');
+    console.error('Error al abrir el PDF:', error);
+    Alert.alert('Error', 'No se pudo abrir el PDF. Verifica tu conexión.');
   }
 }
 
@@ -65,14 +80,14 @@ export default function VideoPlayerScreen() {
   const descargarImagen = async () => {
     if (!video.imagen_descarga_url) return;
     setDescargando('jpg');
-    await descargarYCompartir(video.imagen_descarga_url, `${video.tema}.jpg`);
+    await guardarImagenEnGaleria(video.imagen_descarga_url, `${video.tema}.png`);
     setDescargando(null);
   };
 
   const descargarPdf = async () => {
     if (!video.pdf_resumen_url) return;
     setDescargando('pdf');
-    await descargarYCompartir(video.pdf_resumen_url, `${video.tema}.pdf`);
+    await abrirPdfEnNavegador(video.pdf_resumen_url);
     setDescargando(null);
   };
 
@@ -106,7 +121,6 @@ export default function VideoPlayerScreen() {
         {(
           [
             { key: 'descripcion', label: 'Descripción' },
-            { key: 'contenido', label: 'Contenido' },
             { key: 'descarga', label: 'Descarga' },
           ] as { key: Pestana; label: string }[]
         ).map((tab) => {
@@ -127,23 +141,15 @@ export default function VideoPlayerScreen() {
           </Text>
         )}
 
-        {pestana === 'contenido' && (
-          <Text style={styles.parrafo}>
-            Próximamente: puntos clave y estructuras detalladas de {video.tema.toLowerCase()}.
-          </Text>
-        )}
-
         {pestana === 'descarga' && (
           <View>
             <TouchableOpacity style={styles.descargaFila} onPress={descargarVideo} disabled={descargando !== null}>
               <Icon name="movie-outline" size={22} color={COLORS.primary} />
-              <Text style={styles.descargaTexto}>
-                {video.video_mp4_url ? 'Descargar video explicativo (MP4)' : 'Ver en YouTube'}
-              </Text>
+              <Text style={styles.descargaTexto}>Descargar video explicativo</Text>
               {descargando === 'mp4' ? (
                 <ActivityIndicator size="small" color={COLORS.primary} />
               ) : (
-                <Icon name={video.video_mp4_url ? 'download' : 'open-in-new'} size={20} color={COLORS.primary} />
+                <Icon name="download" size={20} color={COLORS.primary} />
               )}
             </TouchableOpacity>
 

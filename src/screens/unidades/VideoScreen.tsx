@@ -74,7 +74,7 @@ export default function VideoScreen() {
       </View>
 
       <ScrollView contentContainerStyle={styles.contentContainer}>
-        <Text style={styles.sectionTitle}>Videos de este tema</Text>
+        <Text style={styles.sectionTitle}>Videos del tema</Text>
         
         {videos.map((video, index) => {
           const yId = video.url ? getYoutubeId(video.url) : null;

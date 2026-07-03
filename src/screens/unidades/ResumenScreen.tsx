@@ -67,9 +67,7 @@ export default function ResumenScreen() {
           <Icon name="chevron-left" size={32} color="#FFF" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Resumen</Text>
-        <TouchableOpacity style={styles.backBtn}>
-          <Icon name="download" size={24} color="#FFF" />
-        </TouchableOpacity>
+        <View style={styles.backBtn} />
       </View>
 
       <ScrollView contentContainerStyle={styles.content}>

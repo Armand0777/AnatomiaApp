@@ -123,6 +123,7 @@ export default function SimulacionExamenScreen() {
       tiempoSegundos,
       unidadId,
       unidadTitulo,
+      unidadNumero,
     });
   };
 

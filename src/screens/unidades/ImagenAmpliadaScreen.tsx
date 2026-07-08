@@ -11,6 +11,7 @@ import {
   NativeScrollEvent,
 } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Image } from 'expo-image';
 import { PinchGestureHandler, State } from 'react-native-gesture-handler';
 import Animated, {
@@ -93,6 +94,7 @@ export default function ImagenAmpliadaScreen() {
   const navigation = useNavigation();
   const route = useRoute<any>();
   const { temaId, temaTitulo } = route.params || {};
+  const { bottom: bottomInset } = useSafeAreaInsets();
 
   const [imagenes, setImagenes] = useState<Multimedia[]>([]);
   const [loading, setLoading] = useState(true);
@@ -186,7 +188,7 @@ export default function ImagenAmpliadaScreen() {
       />
 
       {/* Footer con título de la imagen actual y puntos indicadores */}
-      <View style={styles.footer}>
+      <View style={[styles.footer, { paddingBottom: 16 + bottomInset }]}>
         <Text style={styles.imageTitle}>
           {imagenes[currentIndex]?.titulo || `Imagen ${currentIndex + 1}`}
         </Text>

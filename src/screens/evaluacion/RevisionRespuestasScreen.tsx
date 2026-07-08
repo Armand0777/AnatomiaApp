@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Image } from 'expo-image';
 import Icon from '@expo/vector-icons/MaterialCommunityIcons';
 import { COLORS } from '../../constants/colors';
@@ -26,6 +27,7 @@ export default function RevisionRespuestasScreen() {
   const route = useRoute<any>();
   const { preguntas, respuestasUsuario, unidadId, unidadTitulo, indiceInicial } =
     (route.params ?? {}) as RevisionParams;
+  const { bottom: bottomInset } = useSafeAreaInsets();
 
   const [indiceActual, setIndiceActual] = useState(indiceInicial ?? 0);
 
@@ -93,7 +95,7 @@ export default function RevisionRespuestasScreen() {
         )}
       </ScrollView>
 
-      <View style={styles.footer}>
+      <View style={[styles.footer, { paddingBottom: 16 + bottomInset }]}>
         <View style={styles.paginacionRow}>
           <TouchableOpacity
             style={[styles.pagBtn, indiceActual === 0 && styles.pagBtnDisabled]}

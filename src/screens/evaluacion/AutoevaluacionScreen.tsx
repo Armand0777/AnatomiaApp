@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, FlatList, ActivityIndicator, Modal } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Icon from '@expo/vector-icons/MaterialCommunityIcons';
 import { COLORS } from '../../constants/colors';
 import { MODULOS } from '../../constants/modulos';
@@ -16,6 +17,7 @@ export default function AutoevaluacionScreen() {
   const navigation = useNavigation<any>();
   const { puedeEvaluar, puedeGestionar, puedeVerReportes } = useRolAcceso();
   const logout = useAuthStore((state) => state.logout);
+  const { bottom: bottomInset } = useSafeAreaInsets();
 
   const [unidades, setUnidades] = useState<UnidadConTemas[]>([]);
   const [cargando, setCargando] = useState(true);
@@ -131,7 +133,7 @@ export default function AutoevaluacionScreen() {
       )}
 
       {/* Botón principal */}
-      <View style={styles.footer}>
+      <View style={[styles.footer, { paddingBottom: 20 + bottomInset }]}>
         <TouchableOpacity
           style={[styles.iniciarBtn, !unidadSeleccionada && styles.iniciarBtnDisabled]}
           disabled={!unidadSeleccionada}

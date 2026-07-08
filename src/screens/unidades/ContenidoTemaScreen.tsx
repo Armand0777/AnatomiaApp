@@ -8,6 +8,7 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Icon from '@expo/vector-icons/MaterialCommunityIcons';
 import { Image } from 'expo-image';
 import { COLORS } from '../../constants/colors';
@@ -30,6 +31,7 @@ export default function ContenidoTemaScreen() {
   const navigation = useNavigation<{ navigate: (screen: string, params: Record<string, unknown>) => void; goBack: () => void }>();
   const route = useRoute();
   const { temaId, temaTitulo, temaOrden, unidadNumero, unidadId, unidadTitulo } = (route.params ?? {}) as ContenidoTemaParams;
+  const { bottom: bottomInset } = useSafeAreaInsets();
 
   const { esFavorito, agregarFavorito, eliminarFavorito, cargarFavoritos } = useFavoritesStore();
 
@@ -218,7 +220,7 @@ export default function ContenidoTemaScreen() {
       </ScrollView>
 
       {/* Barra inferior de acciones */}
-      <View style={styles.bottomBar}>
+      <View style={[styles.bottomBar, { bottom: 20 + bottomInset }]}>
         <TouchableOpacity
           style={styles.bottomBtn}
           onPress={() => navigation.navigate('ImagenAmpliada', { ...sharedNavParams })}

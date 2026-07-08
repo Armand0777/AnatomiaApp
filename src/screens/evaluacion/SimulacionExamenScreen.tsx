@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, ActivityIndicator, Alert, BackHandler, Modal } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Image } from 'expo-image';
 import Icon from '@expo/vector-icons/MaterialCommunityIcons';
 import { COLORS } from '../../constants/colors';
@@ -37,6 +38,7 @@ export default function SimulacionExamenScreen() {
   const navigation = useNavigation<any>();
   const route = useRoute<any>();
   const { unidadId, unidadTitulo, unidadNumero } = (route.params ?? {}) as ExamenParams;
+  const { bottom: bottomInset } = useSafeAreaInsets();
 
   const [cargando, setCargando] = useState(true);
   const [preguntas, setPreguntas] = useState<Pregunta[]>([]);
@@ -245,7 +247,7 @@ export default function SimulacionExamenScreen() {
       </ScrollView>
 
       {/* Footer */}
-      <View style={styles.footer}>
+      <View style={[styles.footer, { paddingBottom: 16 + bottomInset }]}>
         <View style={styles.footerInfoRow}>
           <View style={styles.unidadBadge}>
             <Text style={styles.unidadBadgeText}>Unidad {unidadNumero ?? ''}</Text>

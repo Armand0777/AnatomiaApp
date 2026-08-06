@@ -11,5 +11,5 @@ export const CATEGORIAS_ANATOMICAS: CategoriaInfo[] = [
   { categoria: 'osteologia', titulo: 'Osteología', icono: '🦴' },
   { categoria: 'miologia', titulo: 'Miología', icono: '💪' },
   { categoria: 'organos_sentidos', titulo: 'Órganos de los sentidos', icono: '👁️' },
-  { categoria: 'vias_respiratorias', titulo: 'Vías respiratorias superiores', icono: '🫁' },
+  { categoria: 'vias_respiratorias', titulo: 'Vías digestivas y respiratorias superiores', icono: '🫁' },
 ];

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator, Image, Modal } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Icon from '@expo/vector-icons/MaterialCommunityIcons';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import Animated, { useSharedValue, useAnimatedStyle, withTiming, runOnJS } from 'react-native-reanimated';
@@ -81,6 +82,7 @@ export default function EsquemaVisorScreen() {
   const navigation = useNavigation<any>();
   const route = useRoute<any>();
   const { temaKey, temaTitulo } = (route.params ?? {}) as VisorParams;
+  const { bottom: bottomInset } = useSafeAreaInsets();
 
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState(false);
@@ -258,7 +260,7 @@ export default function EsquemaVisorScreen() {
           </View>
 
           {mostrarEtiquetas && (
-            <Text style={styles.pie}>
+            <Text style={[styles.pie, { paddingBottom: 12 + bottomInset }]}>
               Pellizca para hacer zoom, arrastra para mover, y toca una etiqueta para ver su descripción
             </Text>
           )}
@@ -268,7 +270,7 @@ export default function EsquemaVisorScreen() {
       {/* Cartel inferior con la descripción de la etiqueta tocada */}
       <Modal visible={!!etiquetaActiva} transparent animationType="fade" onRequestClose={() => setEtiquetaActiva(null)}>
         <TouchableOpacity style={styles.modalOverlay} activeOpacity={1} onPress={() => setEtiquetaActiva(null)}>
-          <View style={styles.cartel}>
+          <View style={[styles.cartel, { paddingBottom: 36 + bottomInset }]}>
             <View style={styles.cartelHeader}>
               {etiquetaActiva?.icono && <Icon name={etiquetaActiva.icono as any} size={20} color={COLORS.primary} />}
               <Text style={styles.cartelNombre}>{etiquetaActiva?.nombre}</Text>
@@ -284,7 +286,7 @@ export default function EsquemaVisorScreen() {
       {/* Cartel de información sobre cómo usar el visor */}
       <Modal visible={mostrarInfo} transparent animationType="fade" onRequestClose={() => setMostrarInfo(false)}>
         <TouchableOpacity style={styles.modalOverlay} activeOpacity={1} onPress={() => setMostrarInfo(false)}>
-          <View style={styles.cartel}>
+          <View style={[styles.cartel, { paddingBottom: 36 + bottomInset }]}>
             <View style={styles.cartelHeader}>
               <Icon name="information-outline" size={20} color={COLORS.primary} />
               <Text style={styles.cartelNombre}>Cómo usar el visor</Text>
